@@ -1,0 +1,27 @@
+services:
+  server:
+    build:
+      context: ./backend
+    ports:
+      - 3000:3000
+  # nginx:
+  #   container_name: proxy_nginx
+  #   depends_on:
+  #     - server
+  #     - db
+  #   image: nginx:latest
+  #   ports:
+  #     - '80:80'
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - ./nginx:/etc/nginx/conf.d
+  #     - ./client:/var/www/static
+  #   restart: always
+  client:  
+    build:
+      context: ./frontend
+    ports:
+      - 80:80
+    depends_on:
+      - server  
