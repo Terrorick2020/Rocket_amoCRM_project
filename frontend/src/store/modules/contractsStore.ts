@@ -8,20 +8,24 @@ interface State {
     isLoadedContructs: boolean;
 }
 
-interface DynamicKeyObject {
-    query: string | undefined;
-  }
 
 export default {
     actions: {
-        async loadContractsList(context: ActionContext<any, any>, data: DynamicKeyObject ) {
+        async loadContractsList(context: ActionContext<any, any>, data: Record<string, any> ) {
             try {
                 context.commit( 'resetLoadedStatus' );
 
-                if( data.query ) {
-                    data.query = DOMPurify.sanitize( data.query );
+                let queryString = '';
+
+                if( data ) {
+                    queryString += '?';
+                    Object.keys( data ).forEach( key => {
+                        queryString += `${key}=${data[key]}&`;
+                    } )
+                    queryString =  queryString.slice(0, queryString.lastIndexOf( '&' ) );
                 }
-                const response = await axios.get(`http://localhost:3000/api/leads${data.query ? '?query=' + data.query : ''}`);
+
+                const response = await axios.get(`http://localhost:3000/api/leads${queryString ? queryString : ''}`);
                 
                 if( response.data._embedded ) {
                     context.commit( 'setContractsList', response.data._embedded.leads );
