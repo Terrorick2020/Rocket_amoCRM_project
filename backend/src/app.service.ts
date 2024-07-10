@@ -27,7 +27,7 @@ export class AppService {
     }
 
     try {
-      const response = await this.http.get(`/api/v4/leads?чвава`);
+      const response = await this.http.get(`/api/v4/leads?${queryString}`);
       const data = response.data;
       if (!data._embedded) return { leads: 0 };
       for (const l of data._embedded.leads) {
