@@ -14,20 +14,23 @@ export class AppService {
   async getLeads(query: Record<string, string>) {
     this.http.defaults.headers.common['Authorization'] =
       `Bearer ${this.configService.get<string>('ACCESS_TOKEN')}`;
-
-    console.log( query );
     
     let queryString = '';
-    Object.keys(query).forEach((key) => {
-      queryString += `${key}=${query[key]}&`;
-    });
+
+    if( query ) {
+      queryString += '?';
+      Object.keys(query).forEach((key) => {
+        if(key!='page'&&key!='limit')
+        queryString += `query=${key}&query=${query[key]}&`;
+      });
+    }
 
     if (queryString.endsWith('&')) {
       queryString = queryString.slice(0, -1);
     }
 
     try {
-      const response = await this.http.get(`/api/v4/leads?${queryString}`);
+      const response = await this.http.get(`/api/v4/leads${queryString}`);
       const data = response.data;
       if (!data._embedded) return { leads: 0 };
       for (const l of data._embedded.leads) {

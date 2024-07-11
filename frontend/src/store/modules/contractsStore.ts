@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ActionContext } from 'vuex';
 import DOMPurify from 'dompurify';
-
+ 
 
 interface State {
     contracts_list: any[];
@@ -15,12 +15,14 @@ export default {
             try {
                 context.commit( 'resetLoadedStatus' );
 
+                console.log( data );
+
                 let queryString = '';
 
                 if( data ) {
                     queryString += '?';
                     Object.keys( data ).forEach( key => {
-                        queryString += `${key}=${data[key]}&`;
+                        queryString += `${DOMPurify.sanitize( key )}=${DOMPurify.sanitize( data[key] )}&`;
                     } )
                     queryString =  queryString.slice(0, queryString.lastIndexOf( '&' ) );
                 }

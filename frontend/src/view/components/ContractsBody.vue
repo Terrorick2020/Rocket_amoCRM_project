@@ -5,10 +5,10 @@
                 <div class="form__head">
                     <h4>Cписок сделок</h4>
                     <div class="head__search">
-                        <img v-if="getContructsList.length > 0 && query.length >= 3" src="../../asset/success.png" alt="success">
+                        <img v-if="getQuerySearch.length > 0 && query.length > 0" src="../../asset/success.png" alt="success">
                         <img v-else-if="query" src="../../asset/warning.png" alt="warn">
                         <div class="search__input">
-                            <input type="text" placeholder="Найти.." @input="querySelect" v-model="query">
+                            <input type="text" placeholder="Найти.." v-model="query">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
                                 <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/>
                             </svg>
@@ -28,8 +28,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <EmptyRow  v-if="getContructsList.length == 0" />
-                            <RowSlot :elem="elem" v-for="elem in getContructsList" :key="elem.id" />
+                            <EmptyRow  v-if="getQuerySearch.length == 0" />
+                            <RowSlot :elem="elem" v-for="elem in getQuerySearch" :key="elem.id" />
                         </tbody>
                     </table>
                 </div>
@@ -49,22 +49,22 @@ export default defineComponent({
     name: 'ContractsBody',
     components: { EmptyRow, RowSlot },
     computed: {
-        ...mapGetters([ 'getContructsList' ])
+        ...mapGetters([ 'getContructsList' ]),
+        getQuerySearch() {
+            let contracts = [...this.$store.getters.getContructsList];
+
+            if(this.query) {
+                contracts = contracts.filter( elem => elem.deal_name.includes( this.query ) ||
+                                                      elem.status.includes( this.query ) ||
+                                                      elem.responsible.includes( this.query ) ||
+                                                      String(elem.budget) === this.query )
+            }
+            return contracts;
+        }
     },
     data() {
         return {
             query: '',
-        }
-    },
-    methods: {
-        async querySelect() {
-            const data = {
-                query: this.query
-            }
-
-            if( this.query.length >= 3 ) {
-                await this.$store?.dispatch('loadContractsList', data );
-            }
         }
     }
 })
